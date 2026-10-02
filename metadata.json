@@ -1,0 +1,6 @@
+{
+  "name": "NNC HR - ระบบบริหารงานบุคคลอัจฉริยะ (HRMS)",
+  "description": "ระบบบริหารทรัพยากรบุคคลอัจฉริยะ (HRMS) ครบวงจร จัดการฐานข้อมูลพนักงาน ระบบการลาอัตโนมัติ การคำนวณและออกสลิปเงินเดือน Time & Attendance แดชบอร์ดวิเคราะห์ผล แจ้งเตือน Line Notify และ 2FA ความปลอดภัยสูง",
+  "requestFramePermissions": ["geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

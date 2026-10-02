@@ -1,0 +1,148 @@
+{
+  "entities": {
+    "Employee": {
+      "title": "Employee",
+      "description": "Employee profile and employment record",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "employeeCode": { "type": "string", "maxLength": 32 },
+        "fullName": { "type": "string", "maxLength": 128 },
+        "email": { "type": "string", "maxLength": 128 },
+        "phone": { "type": "string", "maxLength": 32 },
+        "department": { "type": "string", "maxLength": 64 },
+        "position": { "type": "string", "maxLength": 64 },
+        "role": { "type": "string", "enum": ["admin", "hr_manager", "employee"] },
+        "baseSalary": { "type": "number" },
+        "bankAccount": { "type": "string", "maxLength": 32 },
+        "bankName": { "type": "string", "maxLength": 64 },
+        "startDate": { "type": "string", "maxLength": 16 },
+        "status": { "type": "string", "enum": ["active", "probation", "resigned"] },
+        "probationEndDate": { "type": "string", "maxLength": 16 },
+        "emergencyContact": { "type": "string", "maxLength": 128 },
+        "emergencyPhone": { "type": "string", "maxLength": 32 },
+        "annualLeaveBalance": { "type": "number" },
+        "sickLeaveBalance": { "type": "number" },
+        "businessLeaveBalance": { "type": "number" },
+        "avatarUrl": { "type": "string", "maxLength": 512 },
+        "twoFactorEnabled": { "type": "boolean" },
+        "twoFactorSecret": { "type": "string", "maxLength": 64 },
+        "createdAt": { "type": "string", "maxLength": 64 },
+        "updatedAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["employeeCode", "fullName", "email", "department", "role"]
+    },
+    "LeaveRequest": {
+      "title": "LeaveRequest",
+      "description": "Employee leave submission and approval workflow",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "employeeId": { "type": "string", "maxLength": 64 },
+        "employeeName": { "type": "string", "maxLength": 128 },
+        "employeeCode": { "type": "string", "maxLength": 32 },
+        "department": { "type": "string", "maxLength": 64 },
+        "leaveType": { "type": "string", "enum": ["annual", "sick", "business", "maternity", "other"] },
+        "startDate": { "type": "string", "maxLength": 16 },
+        "endDate": { "type": "string", "maxLength": 16 },
+        "totalDays": { "type": "number" },
+        "reason": { "type": "string", "maxLength": 512 },
+        "documentUrl": { "type": "string", "maxLength": 512 },
+        "status": { "type": "string", "enum": ["pending", "approved", "rejected"] },
+        "approverId": { "type": "string", "maxLength": 64 },
+        "approverName": { "type": "string", "maxLength": 128 },
+        "approverComment": { "type": "string", "maxLength": 512 },
+        "lineNotified": { "type": "boolean" },
+        "createdAt": { "type": "string", "maxLength": 64 },
+        "updatedAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["employeeId", "leaveType", "startDate", "endDate", "totalDays", "status"]
+    },
+    "Payroll": {
+      "title": "Payroll",
+      "description": "Monthly payroll calculation and payslip record",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "monthYear": { "type": "string", "maxLength": 16 },
+        "employeeId": { "type": "string", "maxLength": 64 },
+        "employeeName": { "type": "string", "maxLength": 128 },
+        "employeeCode": { "type": "string", "maxLength": 32 },
+        "department": { "type": "string", "maxLength": 64 },
+        "position": { "type": "string", "maxLength": 64 },
+        "baseSalary": { "type": "number" },
+        "overtimeHours": { "type": "number" },
+        "overtimePay": { "type": "number" },
+        "allowances": { "type": "number" },
+        "bonus": { "type": "number" },
+        "totalEarnings": { "type": "number" },
+        "socialSecurity": { "type": "number" },
+        "withholdingTax": { "type": "number" },
+        "deductions": { "type": "number" },
+        "totalDeductions": { "type": "number" },
+        "netSalary": { "type": "number" },
+        "paymentStatus": { "type": "string", "enum": ["draft", "approved", "paid"] },
+        "paymentDate": { "type": "string", "maxLength": 32 },
+        "createdAt": { "type": "string", "maxLength": 64 },
+        "updatedAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["monthYear", "employeeId", "baseSalary", "netSalary", "paymentStatus"]
+    },
+    "Attendance": {
+      "title": "Attendance",
+      "description": "Daily employee time clock records",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "employeeId": { "type": "string", "maxLength": 64 },
+        "employeeName": { "type": "string", "maxLength": 128 },
+        "date": { "type": "string", "maxLength": 16 },
+        "clockInTime": { "type": "string", "maxLength": 16 },
+        "clockOutTime": { "type": "string", "maxLength": 16 },
+        "status": { "type": "string", "enum": ["on_time", "late", "leave", "absent", "overtime"] },
+        "clockInLocation": { "type": "string", "maxLength": 128 },
+        "clockOutLocation": { "type": "string", "maxLength": 128 },
+        "notes": { "type": "string", "maxLength": 256 },
+        "createdAt": { "type": "string", "maxLength": 64 },
+        "updatedAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["employeeId", "date", "clockInTime", "status"]
+    },
+    "SystemSetting": {
+      "title": "SystemSetting",
+      "description": "Global system configurations including Line Notify and company info",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "companyName": { "type": "string", "maxLength": 128 },
+        "companyTaxId": { "type": "string", "maxLength": 32 },
+        "lineToken": { "type": "string", "maxLength": 128 },
+        "lineNotifyEnabled": { "type": "boolean" },
+        "socialSecurityRate": { "type": "number" },
+        "updatedAt": { "type": "string", "maxLength": 64 }
+      }
+    }
+  },
+  "firestore": {
+    "/employees/{employeeId}": {
+      "schema": "Employee",
+      "description": "Employee database records"
+    },
+    "/leaves/{leaveId}": {
+      "schema": "LeaveRequest",
+      "description": "Leave requests and approval workflow"
+    },
+    "/payrolls/{payrollId}": {
+      "schema": "Payroll",
+      "description": "Monthly payroll entries and payslips"
+    },
+    "/attendances/{attendanceId}": {
+      "schema": "Attendance",
+      "description": "Daily employee attendance clock-in/out records"
+    },
+    "/settings/{settingId}": {
+      "schema": "SystemSetting",
+      "description": "Company and notification settings"
+    }
+  }
+}

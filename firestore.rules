@@ -1,0 +1,97 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isBootstrappedAdmin() {
+      return isSignedIn() && request.auth.token.email == 'nnc.cabletv242@gmail.com';
+    }
+
+    function isAdmin() {
+      return isBootstrappedAdmin() || 
+        (isSignedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.uid)));
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Default deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Admins collection for RBAC
+    match /admins/{adminId} {
+      allow read: if isSignedIn();
+      allow write: if isBootstrappedAdmin();
+    }
+
+    // Employees Collection
+    match /employees/{employeeId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isValidId(employeeId) && (isAdmin() || request.auth.uid == employeeId);
+      allow update: if isSignedIn() && isValidId(employeeId) && (
+        isAdmin() || (
+          request.auth.uid == employeeId && 
+          !incoming().diff(existing()).affectedKeys().hasAny(['role', 'baseSalary', 'employeeCode'])
+        )
+      );
+      allow delete: if isAdmin();
+    }
+
+    // Leave Requests
+    match /leaves/{leaveId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isValidId(leaveId) && (
+        isAdmin() || incoming().employeeId == request.auth.uid
+      );
+      allow update: if isSignedIn() && isValidId(leaveId) && (
+        isAdmin() || (
+          existing().employeeId == request.auth.uid &&
+          existing().status == 'pending' &&
+          incoming().diff(existing()).affectedKeys().hasOnly(['reason', 'startDate', 'endDate', 'totalDays', 'leaveType', 'documentUrl', 'updatedAt'])
+        )
+      );
+      allow delete: if isAdmin() || (
+        isSignedIn() && existing().employeeId == request.auth.uid && existing().status == 'pending'
+      );
+    }
+
+    // Payroll records & payslips
+    match /payrolls/{payrollId} {
+      allow read: if isSignedIn() && (isAdmin() || resource.data.employeeId == request.auth.uid);
+      allow create, update, delete: if isAdmin();
+    }
+
+    // Attendance Clock In / Clock Out
+    match /attendances/{attendanceId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isValidId(attendanceId) && (
+        isAdmin() || incoming().employeeId == request.auth.uid
+      );
+      allow update: if isSignedIn() && isValidId(attendanceId) && (
+        isAdmin() || existing().employeeId == request.auth.uid
+      );
+      allow delete: if isAdmin();
+    }
+
+    // System Settings & Line Notify Configuration
+    match /settings/{settingId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+  }
+}
